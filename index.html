@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Festa na Cidade — A noite de Luanda na tua mão</title>
+<meta name="description" content="Encontra festas, concertos, shows e desporto na tua cidade. Compra bilhetes em segundos, direto no telemóvel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night: #150B1A;
+    --night-2: #1F1129;
+    --card: #251531;
+    --gold: #E8A33D;
+    --magenta: #D6386F;
+    --cream: #F5EDE2;
+    --cream-dim: #C9BEB0;
+    --line: rgba(245,237,226,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background: var(--night);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  a{color:inherit; text-decoration:none;}
+  .display{font-family:'Fraunces', serif;}
+
+  /* ===== Background texture: night pulse ===== */
+  .bg-glow{
+    position: fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(60% 45% at 78% 8%, rgba(214,56,111,0.28), transparent 60%),
+      radial-gradient(55% 40% at 12% 30%, rgba(232,163,61,0.16), transparent 60%),
+      radial-gradient(80% 60% at 50% 100%, rgba(214,56,111,0.10), transparent 60%);
+  }
+
+  header{
+    position: sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 6vw;
+    background: rgba(21,11,26,0.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.05rem; letter-spacing:0.01em;}
+  .logo-mark{
+    width:30px; height:30px; border-radius:8px;
+    background: linear-gradient(135deg, var(--magenta), var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; color:var(--night); font-size:1rem;
+  }
+  nav{display:flex; gap:32px; font-size:0.92rem; color:var(--cream-dim);}
+  nav a:hover{color:var(--cream);}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 12px 22px; border-radius:999px;
+    background: var(--gold); color:#1A0F1F;
+    font-weight:700; font-size:0.92rem;
+    border:none; cursor:pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(232,163,61,0.28);}
+  .btn-ghost{
+    background: transparent; border:1px solid var(--line); color: var(--cream);
+  }
+  .btn-ghost:hover{border-color: rgba(245,237,226,0.35); box-shadow:none;}
+
+  main{position:relative; z-index:1;}
+  section{padding: 96px 6vw;}
+
+  /* ===== Hero ===== */
+  .hero{
+    display:grid; grid-template-columns: 1.05fr 0.95fr; gap: 40px;
+    align-items:center;
+    padding-top: 72px;
+    min-height: 88vh;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase;
+    color: var(--gold); font-weight:700; margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--magenta); animation: pulse 1.8s ease-in-out infinite;}
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.4; transform:scale(1.4);} }
+
+  h1{
+    font-size: clamp(2.6rem, 5.2vw, 4.4rem);
+    line-height: 1.02;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h1 em{
+    font-style:italic; font-weight:600;
+    background: linear-gradient(100deg, var(--gold), var(--magenta));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p.lede{
+    margin-top:24px; font-size:1.12rem; line-height:1.6; color: var(--cream-dim); max-width: 46ch;
+  }
+  .hero-ctas{display:flex; gap:14px; margin-top:36px; flex-wrap:wrap;}
+
+  .hero-stats{display:flex; gap:36px; margin-top:56px;}
+  .stat b{display:block; font-family:'Fraunces', serif; font-size:1.7rem; font-weight:600; color:var(--cream);}
+  .stat span{font-size:0.82rem; color:var(--cream-dim);}
+
+  /* ===== Phone mockup ===== */
+  .phone-wrap{position:relative; display:flex; justify-content:center;}
+  .phone{
+    width: 280px; height: 572px; border-radius: 40px;
+    background: linear-gradient(165deg, #2B1836, #170D1E);
+    border: 1px solid rgba(245,237,226,0.14);
+    box-shadow: 0 40px 90px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.02);
+    padding: 16px;
+    position:relative;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float{ 0%,100%{transform: translateY(0px) rotate(-1.2deg);} 50%{transform: translateY(-14px) rotate(0.6deg);} }
+  .phone-screen{
+    width:100%; height:100%; border-radius:26px; overflow:hidden;
+    background: linear-gradient(180deg, #1B0F24, #150B1A);
+    padding: 18px 14px; display:flex; flex-direction:column; gap:12px;
+  }
+  .p-topbar{display:flex; justify-content:space-between; align-items:center; font-size:0.7rem; color:var(--cream-dim); margin-bottom:4px;}
+  .p-title{font-family:'Fraunces', serif; font-size:1.15rem; font-weight:600;}
+  .event-card{
+    background: var(--card); border-radius:16px; padding:12px; border:1px solid var(--line);
+    display:flex; gap:10px; align-items:center;
+  }
+  .event-thumb{
+    width:52px; height:52px; border-radius:10px; flex-shrink:0;
+    background: linear-gradient(135deg, var(--magenta), #7A2A52);
+  }
+  .event-thumb.b{background: linear-gradient(135deg, var(--gold), #A6672A);}
+  .event-thumb.c{background: linear-gradient(135deg, #4E8CA6, #23485A);}
+  .event-meta small{color:var(--cream-dim); font-size:0.68rem;}
+  .event-meta div{font-size:0.85rem; font-weight:600; margin-top:2px;}
+  .price-chip{
+    margin-left:auto; background: rgba(232,163,61,0.16); color:var(--gold);
+    font-size:0.68rem; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap;
+  }
+  .p-cta{
+    margin-top:auto; background: var(--gold); color:#1A0F1F; text-align:center;
+    padding:13px; border-radius:14px; font-weight:700; font-size:0.85rem;
+  }
+  .floaty-badge{
+    position:absolute; background: var(--card); border:1px solid var(--line);
+    padding:10px 14px; border-radius:14px; font-size:0.78rem; font-weight:600;
+    box-shadow: 0 16px 30px rgba(0,0,0,0.4);
+    display:flex; align-items:center; gap:8px;
+  }
+  .floaty-badge.b1{top:14%; left:-8%; animation: float 5s ease-in-out infinite;}
+  .floaty-badge.b2{bottom:16%; right:-10%; animation: float 5.5s ease-in-out infinite reverse;}
+  .floaty-badge .ico{width:8px;height:8px;border-radius:50%; background:var(--magenta);}
+
+  /* ===== Section headers ===== */
+  .sec-head{max-width:640px; margin-bottom:52px;}
+  .sec-eyebrow{color:var(--magenta); font-weight:700; font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px; display:block;}
+  h2{font-family:'Fraunces', serif; font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weight:600; line-height:1.15;}
+  .sec-head p{margin-top:16px; color:var(--cream-dim); font-size:1.05rem; line-height:1.6;}
+
+  /* ===== Categories strip ===== */
+  .cat-strip{
+    display:flex; gap:14px; overflow-x:auto; padding-bottom:8px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .cat-strip::-webkit-scrollbar{display:none;}
+  .cat-pill{
+    flex-shrink:0; padding:14px 22px; border-radius:16px; border:1px solid var(--line);
+    background: var(--card); font-weight:600; font-size:0.92rem;
+    display:flex; align-items:center; gap:10px; white-space:nowrap;
+  }
+  .cat-pill .n{color:var(--gold); font-family:'Fraunces', serif; font-size:0.8rem;}
+
+  /* ===== How it works ===== */
+  .steps{display:grid; grid-template-columns: repeat(3,1fr); gap:28px; margin-top:8px;}
+  .step{
+    background: var(--card); border:1px solid var(--line); border-radius:20px; padding:32px 26px;
+    position:relative; overflow:hidden;
+  }
+  .step::before{
+    content:''; position:absolute; top:-40%; right:-30%; width:200px; height:200px; border-radius:50%;
+    background: radial-gradient(circle, rgba(214,56,111,0.18), transparent 70%);
+  }
+  .step .num{
+    font-family:'Fraunces', serif; font-size:2.6rem; font-weight:600; color: rgba(245,237,226,0.16);
+    display:block; margin-bottom:8px;
+  }
+  .step h3{font-size:1.15rem; font-weight:700; margin-bottom:10px;}
+  .step p{color:var(--cream-dim); font-size:0.94rem; line-height:1.55;}
+
+  /* ===== Revenue / organiser split ===== */
+  .split{display:grid; grid-template-columns: 1fr 1fr; gap:24px;}
+  .panel{
+    border-radius:24px; padding:40px; border:1px solid var(--line);
+  }
+  .panel.gold{background: linear-gradient(155deg, rgba(232,163,61,0.14), rgba(37,21,49,0.4));}
+  .panel.mag{background: linear-gradient(155deg, rgba(214,56,111,0.16), rgba(37,21,49,0.4));}
+  .panel h3{font-family:'Fraunces', serif; font-size:1.5rem; font-weight:600; margin-bottom:14px;}
+  .panel p{color:var(--cream-dim); line-height:1.6; margin-bottom:22px;}
+  .tick-list{display:flex; flex-direction:column; gap:12px;}
+  .tick-list li{display:flex; gap:10px; align-items:flex-start; font-size:0.92rem; color:var(--cream);}
+  .tick-list li::before{content:'✓'; color:var(--gold); font-weight:700; flex-shrink:0;}
+
+  /* ===== Final CTA ===== */
+  .cta-final{
+    text-align:center; border-radius:32px; padding:80px 6vw;
+    background: linear-gradient(155deg, rgba(214,56,111,0.22), rgba(21,11,26,0.4));
+    border:1px solid var(--line);
+    margin: 0 6vw 40px;
+  }
+  .cta-final h2{max-width:20ch; margin:0 auto;}
+  .cta-final p{color:var(--cream-dim); margin-top:18px; max-width:44ch; margin-inline:auto;}
+  .cta-final .hero-ctas{justify-content:center; margin-top:34px;}
+
+  footer{
+    padding: 40px 6vw 60px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+    color: var(--cream-dim); font-size:0.85rem;
+  }
+
+  /* ===== Focus visibility ===== */
+  a:focus-visible, button:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:6px;}
+
+  @media (max-width: 900px){
+    nav{display:none;}
+    .hero{grid-template-columns:1fr; text-align:center; padding-top:36px;}
+    .hero p.lede{margin-inline:auto;}
+    .hero-ctas{justify-content:center;}
+    .hero-stats{justify-content:center;}
+    .phone-wrap{margin-top:20px;}
+    .floaty-badge{display:none;}
+    .steps{grid-template-columns:1fr;}
+    .split{grid-template-columns:1fr;}
+    section{padding:64px 6vw;}
+  }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<header>
+  <div class="logo"><span class="logo-mark">F</span> Festa na Cidade</div>
+  <nav>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#categorias">Categorias</a>
+    <a href="#organizadores">Para organizadores</a>
+  </nav>
+  <a href="#download" class="btn">Descarregar app</a>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> Já disponível em Luanda</span>
+      <h1>A noite da tua<br><em>cidade</em>, no bolso.</h1>
+      <p class="lede">Festas, concertos, shows e desporto — descobre o que está a acontecer perto de ti e compra o teu bilhete em segundos, direto no telemóvel.</p>
+      <div class="hero-ctas">
+        <a href="#download" class="btn">Descarregar grátis</a>
+        <a href="#como-funciona" class="btn btn-ghost">Como funciona</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>500 Kz</b><span>por bilhete confirmado</span></div>
+        <div class="stat"><b>Multicaixa</b><span>Express integrado</span></div>
+        <div class="stat"><b>100%</b><span>digital, sem filas</span></div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="floaty-badge b1"><span class="ico"></span> Bilhete confirmado</div>
+      <div class="floaty-badge b2"><span class="ico" style="background:var(--gold)"></span> 3 eventos hoje</div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="p-topbar"><span>21:04</span><span>●●●●</span></div>
+          <div class="p-title">Esta noite</div>
+          <div class="event-card">
+            <div class="event-thumb"></div>
+            <div class="event-meta"><small>Sábado · Talatona</small><div>Kizomba Night</div></div>
+            <div class="price-chip">2.500 Kz</div>
+          </div>
+          <div class="event-card">
+            <div class="event-thumb b"></div>
+            <div class="event-meta"><small>Hoje · Ilha</small><div>Sunset Live</div></div>
+            <div class="price-chip">3.000 Kz</div>
+          </div>
+          <div class="event-card">
+            <div class="event-thumb c"></div>
+            <div class="event-meta"><small>Domingo · Estádio</small><div>Clássico da cidade</div></div>
+            <div class="price-chip">1.500 Kz</div>
+          </div>
+          <div class="p-cta">Ver carteira de bilhetes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="categorias">
+    <div class="sec-head">
+      <span class="sec-eyebrow">Explora</span>
+      <h2>Tudo o que acontece na cidade, numa lista só.</h2>
+    </div>
+    <div class="cat-strip">
+      <div class="cat-pill"><span class="n">01</span> Festas &amp; Kizomba</div>
+      <div class="cat-pill"><span class="n">02</span> Concertos &amp; Shows</div>
+      <div class="cat-pill"><span class="n">03</span> Desporto</div>
+      <div class="cat-pill"><span class="n">04</span> Lazer &amp; Família</div>
+      <div class="cat-pill"><span class="n">05</span> Vida noturna</div>
+      <div class="cat-pill"><span class="n">06</span> Cultura</div>
+    </div>
+  </section>
+
+  <section id="como-funciona">
+    <div class="sec-head">
+      <span class="sec-eyebrow">Como funciona</span>
+      <h2>Do sofá ao bilhete confirmado, em três passos.</h2>
+      <p>Sem filas, sem revendedores, sem complicação — tudo dentro da app.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>Descobre</h3>
+        <p>Explora os eventos perto de ti, filtrados por categoria, data e zona da cidade.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Paga por Multicaixa Express</h3>
+        <p>Confirma a compra e paga por transferência — o organizador valida e o teu bilhete fica ativo.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Mostra o bilhete à entrada</h3>
+        <p>O teu bilhete fica guardado na carteira da app, pronto a mostrar no dia do evento.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="organizadores">
+    <div class="split">
+      <div class="panel mag">
+        <h3>Para quem vai à festa</h3>
+        <p>A tua próxima saída está a um toque de distância.</p>
+        <ul class="tick-list">
+          <li>Descobre eventos por zona da cidade</li>
+          <li>Compra e guarda bilhetes na carteira digital</li>
+          <li>Recebe confirmação assim que o pagamento é validado</li>
+        </ul>
+      </div>
+      <div class="panel gold">
+        <h3>Para organizadores</h3>
+        <p>Cria o teu evento e vende bilhetes sem sair da app.</p>
+        <ul class="tick-list">
+          <li>Modo organizador com criação de eventos</li>
+          <li>Confirma pagamentos recebidos por Multicaixa Express</li>
+          <li>Acompanha vendas em tempo real</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="cta-final">
+      <h2>A cidade não para. Tu também não devias.</h2>
+      <p>Descarrega a Festa na Cidade e encontra a tua próxima noite, hoje.</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn">Descarregar para Android</a>
+        <a href="#" class="btn btn-ghost">Descarregar para iOS</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="logo"><span class="logo-mark">F</span> Festa na Cidade</div>
+  <div>© 2026 Festa na Cidade · Luanda, Angola</div>
+</footer>
+
+</body>
+</html>
