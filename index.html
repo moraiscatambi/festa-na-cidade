@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Festa na Cidade</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { background:#0f0a1a; font-family: -apple-system, Segoe UI, Roboto, sans-serif; }
+  ::-webkit-scrollbar { display:none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const SUPABASE_URL = "https://xlxttjkgiecaizhwegfy.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseHR0amtnaWVjYWl6aHdlZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MjQ1ODMsImV4cCI6MjEwMjEwMDU4M30.aqEAdmMpkMpfDKJD8VWW20IhdwnDephhaTyfQI5RRO0";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CORES = [
+  "linear-gradient(135deg,#ff6b6b,#c724b1)",
+  "linear-gradient(135deg,#f9a826,#ff5858)",
+  "linear-gradient(135deg,#26c6da,#2952e3)",
+  "linear-gradient(135deg,#7b2ff7,#f107a3)",
+];
+const corAleatoria = () => CORES[Math.floor(Math.random()*CORES.length)];
+
+function Header({ tab, setTab }) {
+  const abas = [
+    ["explorar","Explorar"],["carteira","Carteira"],
+    ["organizador","Organizador"],["perfil","Perfil"]
+  ];
+  return (
+    <div className="sticky top-0 z-20 bg-[#0f0a1a]/95 backdrop-blur border-b border-white/10 px-4 pt-4 pb-2">
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-xl font-bold text-white">🎉 Festa na Cidade</h1>
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {abas.map(([key,label])=>(
+          <button key={key} onClick={()=>setTab(key)}
+            className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition ${
+              tab===key ? "bg-gradient-to-r from-pink-600 to-orange-500 text-white"
+                        : "bg-white/5 text-white/60"}`}>
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Auth() {
+  const [modo, setModo] = useState("login");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [nome, setNome] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const [avisoRegisto, setAvisoRegisto] = useState(false);
+
+  const submeter = async () => {
+    setErro(""); setCarregando(true); setAvisoRegisto(false);
+    try {
+      if (modo === "login") {
+        const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+        if (error) throw error;
+      } else {
+        const { error } = await sb.auth.signUp({
+          email, password: senha, options: { data: { nome } }
+        });
+        if (error) throw error;
+        setAvisoRegisto(true);
+      }
+    } catch (e) {
+      setErro(e.message || "Erro ao autenticar");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  return (
+    <div className="px-4 pt-10 pb-24 max-w-sm mx-auto">
+      <h2 className="text-white text-2xl font-bold text-center mb-1">🎉 Festa na Cidade</h2>
+      <p className="text-white/40 text-center text-sm mb-6">
+        {modo === "login" ? "Entra na tua conta" : "Cria a tua conta"}
+      </p>
+      {modo === "registo" && (
+        <input value={nome} onChange={e=>setNome(e.target.value)} placeholder="Nome completo"
+          className="w-full mb-3 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      )}
+      <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" type="email"
+        className="w-full mb-3 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      <input value={senha} onChange={e=>setSenha(e.target.value)} placeholder="Palavra-passe" type="password"
+        className="w-full mb-3 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      {erro && <p className="text-red-400 text-sm mb-3">{erro}</p>}
+      {avisoRegisto && <p className="text-green-400 text-sm mb-3">Conta criada! Verifique o seu email para confirmar (se exigido) e depois entre.</p>}
+      <button disabled={carregando || !email || !senha} onClick={submeter}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-orange-500 text-white font-semibold disabled:opacity-40">
+        {carregando ? "A processar..." : modo === "login" ? "Entrar" : "Criar conta"}
+      </button>
+      <button onClick={()=>{setModo(modo==="login"?"registo":"login"); setErro(""); setAvisoRegisto(false);}}
+        className="w-full mt-4 text-white/50 text-sm text-center">
+        {modo === "login" ? "Ainda não tens conta? Regista-te" : "Já tens conta? Entrar"}
+      </button>
+    </div>
+  );
+}
+
+function EventoCard({ ev, onClick }) {
+  return (
+    <div onClick={onClick}
+      className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-4 active:scale-[0.98] transition">
+      <div className="h-32" style={{background: ev.cor || corAleatoria()}} />
+      <div className="p-3">
+        <div className="flex justify-between items-start">
+          <h3 className="text-white font-semibold text-base">{ev.nome}</h3>
+          {ev.categoria && <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full">{ev.categoria}</span>}
+        </div>
+        <p className="text-white/50 text-sm mt-1">📍 {ev.local}</p>
+        <p className="text-white/50 text-sm">📅 {ev.data} {ev.hora ? "· " + ev.hora : ""}</p>
+        <p className="text-orange-400 font-bold mt-2">{Number(ev.preco).toLocaleString()} Kz</p>
+      </div>
+    </div>
+  );
+}
+
+function DetalheEvento({ ev, onVoltar, onComprar }) {
+  return (
+    <div className="px-4 pb-24">
+      <button onClick={onVoltar} className="text-white/60 mb-3">← Voltar</button>
+      <div className="h-48 rounded-2xl mb-4" style={{background: ev.cor || corAleatoria()}} />
+      <h2 className="text-white text-2xl font-bold">{ev.nome}</h2>
+      <p className="text-white/50 mt-1">📍 {ev.local}</p>
+      <p className="text-white/50">📅 {ev.data} {ev.hora ? "· " + ev.hora : ""}</p>
+      <p className="text-orange-400 text-xl font-bold mt-3">{Number(ev.preco).toLocaleString()} Kz</p>
+      <button onClick={onComprar}
+        className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-orange-500 text-white font-semibold">
+        Comprar Bilhete
+      </button>
+    </div>
+  );
+}
+
+function Pagamento({ ev, user, onConfirmado, onVoltar }) {
+  const [nome, setNome] = useState("");
+  const [tel, setTel] = useState("");
+  const [aGuardar, setAGuardar] = useState(false);
+  const [erro, setErro] = useState("");
+
+  const confirmar = async () => {
+    setAGuardar(true); setErro("");
+    const codigo = "FC-" + Math.random().toString(36).slice(2,8).toUpperCase();
+    const { error } = await sb.from("bilhetes").insert({
+      evento_id: ev.id,
+      codigo,
+      comprador_nome: nome,
+      comprador_telefone: tel,
+      preco: ev.preco,
+      estado: "pendente",
+      user_id: user.id
+    });
+    setAGuardar(false);
+    if (error) { setErro(error.message); return; }
+    onConfirmado();
+  };
+
+  return (
+    <div className="px-4 pb-24">
+      <button onClick={onVoltar} className="text-white/60 mb-3">← Voltar</button>
+      <h2 className="text-white text-lg font-bold mb-4">Pagamento via Multicaixa Express</h2>
+      <div className="bg-white/5 rounded-xl p-4 mb-4 border border-white/10">
+        <p className="text-white/70 text-sm">Evento: <span className="text-white">{ev.nome}</span></p>
+        <p className="text-white/70 text-sm">Valor: <span className="text-orange-400 font-bold">{Number(ev.preco).toLocaleString()} Kz</span></p>
+      </div>
+      <input value={nome} onChange={e=>setNome(e.target.value)} placeholder="Nome completo"
+        className="w-full mb-3 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      <input value={tel} onChange={e=>setTel(e.target.value)} placeholder="Número Multicaixa Express"
+        className="w-full mb-3 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      {erro && <p className="text-red-400 text-sm mb-3">{erro}</p>}
+      <p className="text-white/40 text-xs mb-4">Após confirmar, o bilhete fica pendente até o organizador validar a transferência.</p>
+      <button disabled={!nome || !tel || aGuardar} onClick={confirmar}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-orange-500 text-white font-semibold disabled:opacity-40">
+        {aGuardar ? "A confirmar..." : "Confirmar Pagamento"}
+      </button>
+    </div>
+  );
+}
+
+function Carteira({ user }) {
+  const [bilhetes, setBilhetes] = useState(null);
+  const [erro, setErro] = useState("");
+
+  const carregar = async () => {
+    const { data, error } = await sb
+      .from("bilhetes")
+      .select("*, eventos(nome, local, data, hora, cor)")
+      .eq("user_id", user.id)
+      .order("id", { ascending: false });
+    if (error) { setErro(error.message); return; }
+    setBilhetes(data || []);
+  };
+
+  useEffect(() => { carregar(); }, []);
+
+  if (erro) return <p className="text-red-400 text-center mt-10 px-4">{erro}</p>;
+  if (bilhetes === null) return <p className="text-white/40 text-center mt-10">A carregar...</p>;
+  if (bilhetes.length === 0)
+    return <p className="text-white/40 text-center mt-10 px-4">Ainda não tem bilhetes. Explore eventos para comprar!</p>;
+
+  return (
+    <div className="px-4 pb-24">
+      {bilhetes.map((b)=>(
+        <div key={b.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3">
+          <div className="flex justify-between items-center">
+            <h3 className="text-white font-semibold">{b.eventos?.nome || "Evento"}</h3>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${
+              b.estado==="pendente" ? "bg-yellow-500/20 text-yellow-400" : "bg-green-500/20 text-green-400"}`}>
+              {b.estado}
+            </span>
+          </div>
+          <p className="text-white/50 text-sm mt-1">📅 {b.eventos?.data} {b.eventos?.hora ? "· " + b.eventos.hora : ""}</p>
+          <p className="text-white/50 text-sm">🎫 Código: {b.codigo}</p>
+          <p className="text-white/50 text-sm">👤 {b.comprador_nome}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CriarEvento({ user, onCriado }) {
+  const [form, setForm] = useState({ nome:"", local:"", data:"", hora:"", categoria:"", preco:"" });
+  const [aGuardar, setAGuardar] = useState(false);
+  const [erro, setErro] = useState("");
+  const [ok, setOk] = useState(false);
+
+  const set = (campo) => (e) => setForm({ ...form, [campo]: e.target.value });
+
+  const criar = async () => {
+    setAGuardar(true); setErro(""); setOk(false);
+    const { error } = await sb.from("eventos").insert({
+      nome: form.nome,
+      local: form.local,
+      data: form.data,
+      hora: form.hora,
+      categoria: form.categoria,
+      preco: Number(form.preco) || 0,
+      cor: corAleatoria(),
+      organizador_id: user.id
+    });
+    setAGuardar(false);
+    if (error) { setErro(error.message); return; }
+    setOk(true);
+    setForm({ nome:"", local:"", data:"", hora:"", categoria:"", preco:"" });
+    onCriado();
+  };
+
+  const camposOk = form.nome && form.local && form.data && form.preco;
+
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+      <p className="text-white font-semibold mb-3">Criar Novo Evento</p>
+      <input value={form.nome} onChange={set("nome")} placeholder="Nome do evento"
+        className="w-full mb-2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      <input value={form.local} onChange={set("local")} placeholder="Local"
+        className="w-full mb-2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      <div className="flex gap-2 mb-2">
+        <input value={form.data} onChange={set("data")} placeholder="Data (ex: 20 Ago)"
+          className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+        <input value={form.hora} onChange={set("hora")} placeholder="Hora (ex: 21:00)"
+          className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      </div>
+      <div className="flex gap-2 mb-3">
+        <input value={form.categoria} onChange={set("categoria")} placeholder="Categoria"
+          className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+        <input value={form.preco} onChange={set("preco")} placeholder="Preço (Kz)" type="number"
+          className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30" />
+      </div>
+      {erro && <p className="text-red-400 text-sm mb-2">{erro}</p>}
+      {ok && <p className="text-green-400 text-sm mb-2">Evento criado com sucesso!</p>}
+      <button disabled={!camposOk || aGuardar} onClick={criar}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-orange-500 text-white font-semibold disabled:opacity-40">
+        {aGuardar ? "A criar..." : "+ Criar Evento"}
+      </button>
+    </div>
+  );
+}
+
+function Organizador({ user }) {
+  const [meusEventos, setMeusEventos] = useState([]);
+  const [pendentes, setPendentes] = useState([]);
+  const [erro, setErro] = useState("");
+
+  const carregar = async () => {
+    const { data: evs, error: e1 } = await sb.from("eventos").select("*").eq("organizador_id", user.id).order("id", { ascending:false });
+    if (e1) { setErro(e1.message); return; }
+    setMeusEventos(evs || []);
+    if (evs && evs.length > 0) {
+      const ids = evs.map(e=>e.id);
+      const { data: bils } = await sb.from("bilhetes").select("*").in("evento_id", ids).eq("estado", "pendente");
+      setPendentes(bils || []);
+    } else {
+      setPendentes([]);
+    }
+  };
+
+  useEffect(() => { carregar(); }, []);
+
+  const confirmarBilhete = async (id) => {
+    await sb.from("bilhetes").update({ estado: "confirmado" }).eq("id", id);
+    carregar();
+  };
+
+  return (
+    <div className="px-4 pb-24">
+      <h2 className="text-white text-lg font-bold mb-4">Modo Organizador</h2>
+      {erro && <p className="text-red-400 text-sm mb-3">{erro}</p>}
+      <CriarEvento user={user} onCriado={carregar} />
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+        <p className="text-white font-semibold mb-1">Bilhetes pendentes</p>
+        {pendentes.length === 0 ? (
+          <p className="text-white/40 text-sm">Nenhum bilhete pendente no momento.</p>
+        ) : pendentes.map(b=>(
+          <div key={b.id} className="flex items-center justify-between border-t border-white/10 py-2">
+            <div>
+              <p className="text-white text-sm">{b.comprador_nome}</p>
+              <p className="text-white/40 text-xs">{b.codigo} · {Number(b.preco).toLocaleString()} Kz</p>
+            </div>
+            <button onClick={()=>confirmarBilhete(b.id)}
+              className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Confirmar</button>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+        <p className="text-white font-semibold mb-2">Meus eventos ({meusEventos.length})</p>
+        {meusEventos.map(e=>(
+          <p key={e.id} className="text-white/60 text-sm border-t border-white/10 py-2">{e.nome} · {e.data}</p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Perfil({ user, onSair }) {
+  return (
+    <div className="px-4 pb-24 text-center mt-6">
+      <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-pink-600 to-orange-500 flex items-center justify-center text-2xl text-white font-bold mb-3">
+        {(user.user_metadata?.nome || user.email || "?")[0].toUpperCase()}
+      </div>
+      <h2 className="text-white font-bold text-lg">{user.user_metadata?.nome || "Utilizador"}</h2>
+      <p className="text-white/40 text-sm mb-6">{user.email}</p>
+      <div className="bg-white/5 border border-white/10 rounded-2xl divide-y divide-white/10 text-left">
+        <div className="p-4 text-white/80">Meus dados</div>
+        <div className="p-4 text-white/80">Métodos de pagamento</div>
+        <div onClick={onSair} className="p-4 text-red-400 cursor-pointer">Sair</div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [sessao, setSessao] = useState(undefined); // undefined = a carregar, null = sem sessão
+  const [tab, setTab] = useState("explorar");
+  const [eventos, setEventos] = useState([]);
+  const [eventoSel, setEventoSel] = useState(null);
+  const [pagando, setPagando] = useState(false);
+
+  useEffect(() => {
+    sb.auth.getSession().then(({ data }) => setSessao(data.session));
+    const { data: listener } = sb.auth.onAuthStateChange((_event, session) => {
+      setSessao(session);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  const carregarEventos = async () => {
+    const { data, error } = await sb.from("eventos").select("*").order("id", { ascending:false });
+    if (!error) setEventos(data || []);
+  };
+
+  useEffect(() => { if (sessao) carregarEventos(); }, [sessao]);
+
+  if (sessao === undefined) {
+    return <div className="min-h-screen flex items-center justify-center text-white/40">A carregar...</div>;
+  }
+  if (!sessao) {
+    return <Auth />;
+  }
+
+  const user = sessao.user;
+
+  const confirmarPagamento = () => {
+    setPagando(false);
+    setEventoSel(null);
+    setTab("carteira");
+  };
+
+  let conteudo;
+  if (eventoSel && pagando) {
+    conteudo = <Pagamento ev={eventoSel} user={user} onVoltar={()=>setPagando(false)} onConfirmado={confirmarPagamento} />;
+  } else if (eventoSel) {
+    conteudo = <DetalheEvento ev={eventoSel} onVoltar={()=>setEventoSel(null)} onComprar={()=>setPagando(true)} />;
+  } else if (tab === "explorar") {
+    conteudo = (
+      <div className="px-4 pb-24 pt-2">
+        {eventos.length === 0 ? (
+          <p className="text-white/40 text-center mt-10">Ainda não há eventos publicados. Sê o primeiro a criar um no modo Organizador!</p>
+        ) : eventos.map(ev => <EventoCard key={ev.id} ev={ev} onClick={()=>setEventoSel(ev)} />)}
+      </div>
+    );
+  } else if (tab === "carteira") {
+    conteudo = <Carteira user={user} />;
+  } else if (tab === "organizador") {
+    conteudo = <Organizador user={user} />;
+  } else {
+    conteudo = <Perfil user={user} onSair={()=>sb.auth.signOut()} />;
+  }
+
+  return (
+    <div className="min-h-screen">
+      <Header tab={eventoSel ? "" : tab} setTab={(t)=>{ setEventoSel(null); setPagando(false); setTab(t); carregarEventos(); }} />
+      {conteudo}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
